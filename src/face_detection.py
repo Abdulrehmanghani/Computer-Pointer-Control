@@ -40,7 +40,7 @@ class FaceDetection:
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
-        input_img_dict = self.preprocess_input(self, image):
+        input_img_dict = self.preprocess_input(self, image)
         output = net.infer(input_img_dict)
         result = self.output[self.output_name]
         cords =preprocess_outputs(result,image)

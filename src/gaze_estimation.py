@@ -35,17 +35,16 @@ class GazeEstimation:
         '''
         self.net = self.core.load_network(network= self.model, device_name=self.device, num_requests=1)
 
-    def predict(self, image):
+    def predict(self, left_eye_image, right_eye_image, head_pose_angle):
         '''
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
-        input_img_dict = self.preprocess_input(self, image):
+        input_img_dict = self.preprocess_input(self, head_pose_angle, left_eye_image, right_eye_image)
         output = net.infer(input_img_dict)
         result = self.output[self.output_name]
-        cords =preprocess_outputs(result,image)
-        cords = cords.astype(np.int32)
-        face_image = image[cords[1]:cords[3], cords[0]:cords[2]]
+        cords = preprocess_outputs(result,image)
+        
         return face_image, cords
 
     def check_model(self):
@@ -56,15 +55,18 @@ class GazeEstimation:
             exit(1)
         print("All layers are supported")
 
-    def preprocess_input(self, image):
+    def preprocess_input(self, head_pose_angle, left_eye_image, right_eye_image):
     '''
     Before feeding the data into the model for inference,
     you might have to preprocess it. This function is where you can do that.
     '''
-        input_img=cv2.resize(image, (self.input_shape[3],self.input_shape[2]))
-        input_img=input_img.transpose((2, 0, 1))
-        input_img = input_img.reshape(1, *input_img.shape)
-        input_dict{self.input_name: input_img}
+        input_left_eye=cv2.resize(left_eye_image, (self.input_shape[3],self.input_shape[2]))
+        input_right_eye=cv2.resize(right_eye_image, (self.input_shape[3],self.input_shape[2]))
+        input_left_eye = input_left_eye.transpose((2, 0, 1))
+        input_right_eye = input_right_eye.transpose((2, 0, 1))
+        input_left_eye = input_left_eye.reshape(1, *input_left_eye.shape)
+        input_right_eye = input_right_eye.reshape(1, *input_right_eye.shape)
+        input_dict{self.input_name: head_pose_angle,self.input_name: input_left_eye,self.input_name: input_right_eye}
         
         return input_dict
 

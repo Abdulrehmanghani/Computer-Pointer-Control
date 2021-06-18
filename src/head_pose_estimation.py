@@ -40,7 +40,7 @@ class HeadPoseEstimation:
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
-        input_img_dict = self.preprocess_input(self, image):
+        input_img_dict = self.preprocess_input(self, image)
         output = net.infer(input_img_dict)
         result = self.output[self.output_name]
         cords =preprocess_outputs(result,image)
@@ -57,10 +57,10 @@ class HeadPoseEstimation:
         print("All layers are supported")
 
     def preprocess_input(self, image):
-    '''
-    Before feeding the data into the model for inference,
-    you might have to preprocess it. This function is where you can do that.
-    '''
+        '''
+        Before feeding the data into the model for inference,
+        you might have to preprocess it. This function is where you can do that.
+        '''
         input_img=cv2.resize(image, (self.input_shape[3],self.input_shape[2]))
         input_img=input_img.transpose((2, 0, 1))
         input_img = input_img.reshape(1, *input_img.shape)
