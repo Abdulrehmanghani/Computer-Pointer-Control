@@ -44,9 +44,9 @@ class FaceDetection:
         output = net.infer(input_img_dict)
         result = self.output[self.output_name]
         cords =preprocess_outputs(result,image)
-        faces_coordinates = faces_coordinates.astype(np.int32)
-        cropped_face_image = image[faces_coordinates[1]:faces_coordinates[3], faces_coordinates[0]:faces_coordinates[2]]
-        return cropped_face_image, faces_coordinates
+        cords = cords.astype(np.int32)
+        face_image = image[cords[1]:cords[3], cords[0]:cords[2]]
+        return face_image, cords
 
     def check_model(self):
         supported_layers = self.core.query_network(network=self.network, device_name=self.device)
@@ -60,7 +60,8 @@ class FaceDetection:
     '''
     Before feeding the data into the model for inference,
     you might have to preprocess it. This function is where you can do that.
-    ''' input_img=cv2.resize(image, (self.input_shape[3],self.input_shape[2]))
+    ''' 
+        input_img=cv2.resize(image, (self.input_shape[3],self.input_shape[2]))
         input_img=input_img.transpose((2, 0, 1))
         input_img = input_img.reshape(1, *input_img.shape)
         input_dict{self.input_name: input_img}
