@@ -56,8 +56,8 @@ class FaceDetection:
         return face_image, cords
 
     def check_model(self):
-        supported_layers = self.core.query_network(network=self.network, device_name=self.device)
-        unsupported_layers = [layer for layer in self.network.layers.keys() if layer not in supported_layers]
+        supported_layers = self.infer_network.query_network(network=self.net, device_name="CPU")
+        unsupported_layers = [layer for layer in self.net.layers.keys() if layer not in supported_layers]
         if len(unsupported_layers) > 0:
             print("Check extention of these unsupported layers =>" + str(unsupported_layers))
             exit(1)
@@ -81,7 +81,7 @@ class FaceDetection:
     you might have to preprocess the output. This function is where you can do that.
     '''
         cords = []
-        for box in outputs[0][0]: # Output shape is 1x1x100x7
+        for box in outputs[0][0]: # Output shape is [1, 1, N, 7]
             conf = box[2]
             if conf >= self.threshold:
                 x1 = int(box[3] * image.shape[1])
@@ -90,4 +90,5 @@ class FaceDetection:
                 y2 = int(box[6] * image.shape[0])
                 face = image[y1:y2, x1:x2]
                 cords.append((x1,y1,x2,y2))
+                cords = np.asarray(cords[0], dtype=np.int32)
         return cords ,face
