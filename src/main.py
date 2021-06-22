@@ -1,7 +1,6 @@
 import sys
 import cv2
 import time
-import logging as log
 
 from argparse import ArgumentParser
 from input_feeder import InputFeeder
@@ -10,6 +9,8 @@ from face_detection import FaceDetection
 from facial_landmark_detection import FacialLandMark
 from head_pose_estimation import HeadPoseEstimation
 from gaze_estimation import GazeEstimation
+
+from mouse_controller import MouseController
 
 def build_argparser():
     """
@@ -32,8 +33,8 @@ def build_argparser():
     parser.add_argument("-i", "--input", required=True, type=str,
                         help="CAM or path to image or video file.")
     
-    # parser.add_argument("-dis", "--display", required=False, default=True, type=str,
-    #                     help="Flag to display the outputs of the intermediate models")
+    parser.add_argument("-disp", "--display", required=False, default=True, type=str,
+                        help="Flag to display the outputs of the intermediate models")
 
     parser.add_argument("-d", "--device", required=False, default="CPU", type=str,
                         help="Specify the target device to infer on: "
@@ -86,6 +87,8 @@ def infer_on_stream(args):
     headpose_estimation = HeadPoseEstimation(args.hp_model, args.device)
     gaze_estimation = GazeEstimation(args.ge_model, args.device)
     
+    mouse_controller = MouseController('medium', 'fast')
+    
     start_load = time.time()
     
     # Load the models 
@@ -114,21 +117,22 @@ def infer_on_stream(args):
         key_pressed = cv2.waitKey(60)
         
         # Run inference on the models     
-        face, face_coords = face_detection.predict(frame)
-        left_eye, right_eye, eyes_center = landmark_detection.predict(face, face_coords)
-        headpose_angles = headpose_estimation.predict(face, face_coords)
-        gaze_estimation.predict(left_eye, right_eye, headpose_angles)
-        cv2.imwrite("face.jpg",face)
+        face, face_cords = face_detection.predict(frame, args.display)
+        left_eye, right_eye, eyes_center = landmark_detection.predict(frame, face, face_cords, args.display)
+        headpose_angles = headpose_estimation.predict(frame, face, face_cords, args.display)
+        gaze_vector = gaze_estimation.predict(frame, left_eye, right_eye, headpose_angles, eyes_center, args.display)
+        print(gaze_vector)
+        mouse_controller.move(gaze_vector[0], gaze_vector[1])
+        cv2.imshow('Visualization', cv2.resize(frame,(600,400)))
+        #cv2.imwrite("face.jpg",face)
         ## If no face detected move back to the top of the loop
-        if len(face_coords) == 0:
-            log.error("No face detected.")
+        if len(face_cords) == 0:
             continue
-            
         if key_pressed == 27:
             break
        
        # Display the resulting frame
-        cv2.imshow('Visualization', cv2.resize(face,(600,400)))
+        
      
     end_inf = time.time() - start_inf
     
