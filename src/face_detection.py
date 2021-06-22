@@ -26,10 +26,10 @@ class FaceDetection:
         except Exception as e:
             raise ValueError("Could not Initialise the network. Have you enterred the correct model path?")
 
-        self.input_name=next(iter(self.model.inputs))
-        self.input_shape=self.model.inputs[self.input_name].shape
-        self.output_name=next(iter(self.model.outputs))
-        self.output_shape=self.model.outputs[self.output_name].shape
+        self.input_name = next(iter(self.model.inputs))
+        self.input_shape = self.model.inputs[self.input_name].shape
+        self.output_name = next(iter(self.model.outputs))
+        self.output_shape = self.model.outputs[self.output_name].shape
 
     def load_model(self):
         '''
@@ -39,7 +39,7 @@ class FaceDetection:
         '''
         self.net = self.infer_network.load_network( self.model, self.device, num_requests=0)
 
-    def predict(self, image):
+    def predict(self, image,disp):
         '''
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
@@ -50,7 +50,7 @@ class FaceDetection:
             
             result = self.net.requests[0].outputs[self.output_name]
             #result = output[self.output_name]
-            cords , face_image = self.preprocess_output(result,image)
+            cords , face_image = self.preprocess_output(result, image, disp)
             
         return face_image, cords
 
@@ -67,14 +67,14 @@ class FaceDetection:
         Before feeding the data into the model for inference,
         you might have to preprocess it. This function is where you can do that.
         ''' 
-        input_img=cv2.resize(image, (self.input_shape[3],self.input_shape[2]))
-        input_img=input_img.transpose((2, 0, 1))
+        input_img = cv2.resize(image, (self.input_shape[3],self.input_shape[2]))
+        input_img = input_img.transpose((2, 0, 1))
         input_img = input_img.reshape(1, *input_img.shape)
         input_dict = {self.input_name: input_img}
         
         return input_dict
 
-    def preprocess_output(self, outputs, image):
+    def preprocess_output(self, outputs, image, disp):
         '''
         Before feeding the output of this model to the next model,
         you might have to preprocess the output. This function is where you can do that.
@@ -89,5 +89,7 @@ class FaceDetection:
                 y2 = int(box[6] * image.shape[0])
                 face = image[y1:y2, x1:x2]
                 cords.append((x1,y1,x2,y2))
+                if disp:
+                    cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0), 3)
                 cords = np.asarray(cords[0], dtype=np.int32)
         return cords ,face

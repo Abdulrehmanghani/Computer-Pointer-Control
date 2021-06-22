@@ -38,17 +38,17 @@ class FacialLandMark:
         '''
         self.net = self.infer_network.load_network( self.model, self.device, num_requests=0)
 
-    def predict(self, image ,face_cords):
+    def predict(self, image ,face, face_cords, disp):
         '''
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
-        input_img_dict = self.preprocess_input(image)
+        input_img_dict = self.preprocess_input(face)
         self.net.start_async( inputs =input_img_dict, request_id=0)
         if self.net.requests[0].wait(-1) == 0:
             
             result = self.net.requests[0].outputs[self.output_name]
-            left_eye, right_eye, eyes_center = self.preprocess_output(result,face_cords,image)
+            left_eye, right_eye, eyes_center = self.preprocess_output(result,face_cords,image, disp)
         return left_eye, right_eye, eyes_center
 
     def check_model(self):
@@ -73,14 +73,13 @@ class FacialLandMark:
         
         return input_dict
 
-    def preprocess_output(self, outputs, face_cords, image ):
+    def preprocess_output(self, outputs, face_cords, image, disp):
         '''
     Before feeding the output of this model to the next model,
     you might have to preprocess the output. This function is where you can do that.
     ''' 
         
         landmarks = outputs.reshape(1, 10)[0]
-        
         height = face_cords[3] - face_cords[1]
         width = face_cords[2] - face_cords[0]
         
@@ -91,7 +90,7 @@ class FacialLandMark:
         ymin_l = face_cords[1] + y_l - 30
         xmax_l = face_cords[0] + x_l + 30
         ymax_l = face_cords[1] + y_l + 30
-         
+        
         x_r = int(landmarks[2]  *  width)
         y_r = int(landmarks[3]  *  height)
         
@@ -99,7 +98,9 @@ class FacialLandMark:
         ymin_r = face_cords[1] + y_r - 30
         xmax_r = face_cords[0] + x_r + 30
         ymax_r = face_cords[1] + y_r + 30
-
+        if disp:
+            cv2.rectangle(image, (xmin_l, ymin_l), (xmax_l, ymax_l), (255,0,0), 2)        
+            cv2.rectangle(image, (xmin_r, ymin_r), (xmax_r, ymax_r), (255,0,0), 2)
         left_eye_center =[face_cords[0] + x_l, face_cords[1] + y_l]
         right_eye_center = [face_cords[0] + x_r , face_cords[1] + y_r]      
         eyes_center = [left_eye_center, right_eye_center ]
