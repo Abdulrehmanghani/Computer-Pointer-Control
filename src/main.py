@@ -1,6 +1,7 @@
 import sys
 import cv2
 import time
+import logging as log
 
 from argparse import ArgumentParser
 from input_feeder import InputFeeder
@@ -43,13 +44,7 @@ def build_argparser():
     parser.add_argument("-pt", "--prob_threshold", type=float, default=0.6,
                         help="Probability threshold for detections filtering"
                         "(0.6 by default)")
-    
-    # parser.add_argument("-p", "--mouse_precision", required=False, default='high', type=str,
-    #                     help="Set the precision for mouse movement: high, low, medium.")
-                        
-    # parser.add_argument("-sp", "--mouse_speed", required=False, default='fast', type=str,
-    #                     help="Set the speed for mouse movement: fast, slow, medium.")
-                        
+                       
     return parser
 
 def handle_input_type(input_stream):
@@ -69,7 +64,7 @@ def handle_input_type(input_stream):
     elif input_stream.endswith('.mp4'):
         input_type = 'video'
     else: 
-        log.error('Please enter a valid input! .jpg, .png, .bmp, .mp4, CAM')
+        log.error('Please enter a valid input! .jpg, .png, .bmp, .mp4, CAM')    
         sys.exit()    
     return input_type
 
@@ -82,13 +77,19 @@ def infer_on_stream(args):
     """
     
     # Initialise the classes
-    face_detection = FaceDetection(args.fd_model, args.device)
-    landmark_detection = FacialLandMark(args.fl_model, args.device)
-    headpose_estimation = HeadPoseEstimation(args.hp_model, args.device)
-    gaze_estimation = GazeEstimation(args.ge_model, args.device)
+    try:
+        face_detection = FaceDetection(args.fd_model, args.device)
+        landmark_detection = FacialLandMark(args.fl_model, args.device)
+        headpose_estimation = HeadPoseEstimation(args.hp_model, args.device)
+        gaze_estimation = GazeEstimation(args.ge_model, args.device)
+    except:
+        log.error('Please enter a valid model file address')    
+        sys.exit()
+
     
     mouse_controller = MouseController('medium', 'fast')
-    
+    log_object = log.getLogger()
+
     start_load = time.time()
     
     # Load the models 
@@ -96,7 +97,7 @@ def infer_on_stream(args):
     landmark_detection.load_model()
     headpose_estimation.load_model()
     gaze_estimation.load_model()
-
+    log_object.error("Models loaded: time: {:.3f} ms".format((time.time() - start_load) * 1000))
     end_load = time.time() -  start_load 
     
     # Handle the input stream
@@ -107,7 +108,7 @@ def infer_on_stream(args):
     
     # Load the video capture
     feed.load_data()
-    
+    frame_count = 0
     start_inf = time.time()
     
     # Read from the video capture 
@@ -115,29 +116,30 @@ def infer_on_stream(args):
         if not flag:
             break
         key_pressed = cv2.waitKey(60)
-        
-        # Run inference on the models     
-        face, face_cords = face_detection.predict(frame, args.display)
-        left_eye, right_eye, eyes_center = landmark_detection.predict(frame, face, face_cords, args.display)
-        headpose_angles = headpose_estimation.predict(frame, face, face_cords, args.display)
-        gaze_vector = gaze_estimation.predict(frame, left_eye, right_eye, headpose_angles, eyes_center, args.display)
-        print(gaze_vector)
-        mouse_controller.move(gaze_vector[0], gaze_vector[1])
-        cv2.imshow('Visualization', cv2.resize(frame,(600,400)))
-        #cv2.imwrite("face.jpg",face)
-        ## If no face detected move back to the top of the loop
-        if len(face_cords) == 0:
+        frame_count += 1
+        try:
+            # Run inference on the models     
+            face, face_cords = face_detection.predict(frame, args.display)
+            ## If no face detected move back to the top of the loop
+            if len(face_cords) == 0:
+                log_object.error("No face found")
+                continue
+            if key_pressed == 27:
+                break
+            left_eye, right_eye, eyes_center = landmark_detection.predict(frame, face, face_cords, args.display)
+            headpose_angles = headpose_estimation.predict(frame, face, face_cords, args.display)
+            gaze_vector = gaze_estimation.predict(frame, left_eye, right_eye, headpose_angles, eyes_center, args.display)
+            mouse_controller.move(gaze_vector[0], gaze_vector[1])
+            fps.update()
+        except Exception as e:
+            print(str(e) + " for frame " + str(frame_count))
             continue
-        if key_pressed == 27:
-            break
-       
-       # Display the resulting frame
-        
+        # Display the resulting frame
+        if args.display:
+            cv2.imshow('Visualization', cv2.resize(frame,(600,400)))
      
     end_inf = time.time() - start_inf
-    
-    print("Total loading time: {}\nTotal inference time: {} ".format(end_load, end_inf))
-    
+    log_object.error("Total loading time: {}\nTotal inference time: {}\nFPS: {}".format(end_load, end_inf,frame_count/end_inf))
     # Release the capture
     feed.close()
     # Destroy any OpenCV windows
