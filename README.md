@@ -1,6 +1,8 @@
 # Computer Pointer Controller
 
-In this project, we will use a gaze detection model to control the mouse pointer of computer. You will be using the Gaze Estimation model to estimate the gaze of the user's eyes and change the mouse pointer position accordingly. This project will demonstrate your ability to run multiple models in the same machine and coordinate the flow of data between those models.
+In this project, we will use several deep learning models from the OpenVINO model zoo to control the mouse pointer of a computer by using eye gaze. You will be using the Gaze Estimation model to estimate the gaze of the user's eyes and change the mouse pointer position accordingly.
+Firstly, we will detect the face from the input video by using a face detection model. This detected face then passes it to two models for eyes detection and second for head pose estimation. At the end head pose angle and detected eyes image of left and right eye pass to the gaze estimation model to get the gaze vector. This gaze vector is used to control the mouse of a computer.
+
 
 We are using four pre-trained models from the Intel Pre-trained Models Zoo:
 * [Face Detection](https://docs.openvinotoolkit.org/latest/omz_models_intel_face_detection_adas_binary_0001_description_face_detection_adas_binary_0001.html)
@@ -8,25 +10,31 @@ We are using four pre-trained models from the Intel Pre-trained Models Zoo:
 * [Facial LandMarks Detection](https://docs.openvinotoolkit.org/latest/omz_models_intel_landmarks_regression_retail_0009_description_landmarks_regression_retail_0009.html)
 * [Gaze Estimation Model](https://docs.openvinotoolkit.org/latest/omz_models_intel_gaze_estimation_adas_0002_description_gaze_estimation_adas_0002.html)
 
+![pipline](./bin/pipeline.png)
 
 ## Project Set Up and Installation
-**First step**
-Make sure you have the OpenVINO toolkit installed on your system. This project is based on [Intel OpenVINO 2021.3.394](https://docs.openvinotoolkit.org/latest/index.html) toolkit, so if you don't have it, make sure to install it first before continue with the next steps.
+Make sure you have the OpenVINO toolkit installed on your system. This project is based on [Intel OpenVINO 2021.3.394](https://docs.openvinotoolkit.org/latest/index.html) toolkit, so if you don't have it, make sure to install it first before continue with the next steps. Read the dependencies listed on the openVINO website to install it.
 
-**Second step**
-You have to install the pretrained models needed for this project. The following instructions are for mac.
+By using Conda with python==3.5:
+
+```bash
+conda install openvino-ie4py-ubuntu18 -c intel
+```
+
+You have to install the pretrained models needed for this project. The following instructions are for Linux.
 First you have to initialize the openVINO environment
 ```bash
 source /opt/intel/openvino/bin/setupvars.sh
 ```
-You have to run the above command every time you open an new terminal window.
+
+You have to run the above command every time you open an new terminal window or activate a conda env.
 We need the following models
 - [Face Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_face_detection_adas_binary_0001_description_face_detection_adas_binary_0001.html)
 - [Facial Landmarks Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_landmarks_regression_retail_0009_description_landmarks_regression_retail_0009.html)
 - [Head Pose Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)
 - [Gaze Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_gaze_estimation_adas_0002_description_gaze_estimation_adas_0002.html)
 
-To download them run the following commands after you have created a folder with name `model` and got into it.
+To download them run the following commands after you have created a folder with name `model`.
 **Face Detection Model**
 ```bash
 $ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name face-detection-0200 --output_dir Computer-Pointer-Control/models
@@ -44,7 +52,6 @@ $ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader
 $ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name gaze-estimation-adas-0002 --output_dir Computer-Pointer-Control/models
 ```
 
-**Third step**
 Install the requirements:
 ```bash
 $ pip3 install -r requirements.txt
@@ -99,10 +106,9 @@ Argument|Type|Description
 
 
 ## Benchmarks
-Include the benchmark results of running your model on multiple hardwares and multiple model precisions. Your benchmarks can include: model loading time, input/output processing time, model inference time etc.
- The Performance tests were run on HP Laptop with **Intel® Core™ i3-8350K CPU @ 4.00GHz × 4** and **16 GB Ram**
+Include the benchmark results of running multiple model precisions. 
+ The Performance tests were run on **Intel® Core™ i3-8350K CPU @ 4.00GHz × 4** and **16 GB Ram**
 
-#### CPU
 
 | Properties  | FP32        | FP16        | INT8        |
 | ------------| ----------- | ----------- | ----------- |
@@ -116,11 +122,5 @@ We notice the models with low precisions generally tend to give better inference
 
 The models with low precisions are more lightweight than the models with high precisons, so this makes the execution of the network more fast.
 
-## Stand Out Suggestions
-This is where you can provide information about the stand out suggestions that you have attempted.
-
-### Async Inference
-If you have used Async Inference in your code, benchmark the results and explain its effects on power and performance of your project.
-
 ### Edge Cases
-There will be certain situations that will break your inference flow. For instance, lighting changes or multiple people in the frame. Explain some of the edge cases you encountered in your project and how you solved them to make your project more robust.
+The app needs exactly one face to appear in a frame. If there are many, it picks the first one which has a detection confidence not less than a threshold value. In case a face cannot be confidently detected, this frame is not used for mouse control (the output window shows the original frame and the mouse pointer's position remains the same). Possible reasons for detection to fail are bad lighting (too dark or too bright), angle shot, face occlusion. 
