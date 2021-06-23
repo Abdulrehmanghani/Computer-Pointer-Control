@@ -28,13 +28,8 @@ source /opt/intel/openvino/bin/setupvars.sh
 ```
 
 You have to run the above command every time you open an new terminal window or activate a conda env.
-We need the following models
-- [Face Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_face_detection_adas_binary_0001_description_face_detection_adas_binary_0001.html)
-- [Facial Landmarks Detection Model](https://docs.openvinotoolkit.org/latest/_models_intel_landmarks_regression_retail_0009_description_landmarks_regression_retail_0009.html)
-- [Head Pose Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)
-- [Gaze Estimation Model](https://docs.openvinotoolkit.org/latest/_models_intel_gaze_estimation_adas_0002_description_gaze_estimation_adas_0002.html)
 
-To download them run the following commands after you have created a folder with name `model`.
+To download the models run the following commands after you have created a folder with name `model`.
 **Face Detection Model**
 ```bash
 $ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name face-detection-0200 --output_dir Computer-Pointer-Control/models
