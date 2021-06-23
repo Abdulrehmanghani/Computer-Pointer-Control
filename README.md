@@ -29,19 +29,19 @@ We need the following models
 To download them run the following commands after you have created a folder with name `model` and got into it.
 **Face Detection Model**
 ```bash
-$ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "face-detection-adas-binary-0001"
+$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name face-detection-0200 --output_dir Computer-Pointer-Control/models
 ```
 **Facial Landmarks Detection**
 ```bash
-$ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "landmarks-regression-retail-0009"
+$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name landmarks-regression-retail-0009 --output_dir Computer-Pointer-Control/models
 ```
 **Head Pose Estimation**
 ```bash
-$ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "head-pose-estimation-adas-0001"
+$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name head-pose-estimation-adas-0001 --output_dir Computer-Pointer-Control/models
 ```
 **Gaze Estimation Model**
 ```bash
-$ python3 /opt/intel/openvino/deployment_tools/tools/model_downloader/downloader.py --name "gaze-estimation-adas-0002"
+$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name gaze-estimation-adas-0002 --output_dir Computer-Pointer-Control/models
 ```
 
 **Third step**
@@ -53,21 +53,23 @@ $ pip3 install -r requirements.txt
 **Project structure**
 ```bash
 |
-|--demo.mp4
+|--bin
+    |--demo.mp4
 |--model
     |--intel
         |--face-detection-adas-binary-0001
         |--gaze-estimation-adas-0002
         |--head-pose-estimation-adas-0001
         |--landmarks-regression-retail-0009
-|--face_detection.py
-|--facial_landmarks_detection.py
-|--gaze_estimation.py
-|--input_feeder.py
-|--main.py
-|--mouse_controller.py
-|--README.md
-|--requirements.txt
+|--src
+    |--face_detection.py
+    |--facial_landmarks_detection.py
+    |--gaze_estimation.py
+    |--input_feeder.py
+    |--main.py
+    |--mouse_controller.py
+    |--README.md
+    |--requirements.txt
 ```
 
 
@@ -104,9 +106,9 @@ Include the benchmark results of running your model on multiple hardwares and mu
 
 | Properties  | FP32        | FP16        | INT8        |
 | ------------| ----------- | ----------- | ----------- |
-|Model Loading| 0.84s       | 1.17s       | 1.19s       |
-|Infer Time   | 83.80s      | 23.12s      | 42.21s      |
-|FPS          | 0.70fps     | 0.60fps     | 1.39fps     |
+|Model Loading| 0.19139     | 0.183228    | 0.35699     |
+|Infer Time   | 75.9599     | 75.77568    | 68.5793     |
+|FPS          | 0.77672     | 0.77861fps  | 0.8603fps   |
 
 
 ## Results
