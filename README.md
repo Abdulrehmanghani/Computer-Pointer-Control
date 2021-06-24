@@ -1,6 +1,6 @@
 # Computer Pointer Controller
 
-In this project, we will use several deep learning models from the OpenVINO model zoo to control the mouse pointer of a computer by using eye gaze. You will be using the Gaze Estimation model to estimate the gaze of the user's eyes and change the mouse pointer position accordingly.</br>
+In this project, you will use several deep learning models from the OpenVINO model zoo to control the mouse pointer of a computer by using eye gaze. You will be using the Gaze Estimation model to estimate the gaze of the user's eyes and change the mouse pointer position accordingly.</br>
 Firstly, we will detect the face from the input video by using a face detection model. This detected face then passes it to two models for eyes detection and second for head pose estimation. At the end head pose angle and detected eyes image of left and right eye pass to the gaze estimation model to get the gaze vector. This gaze vector is used to control the mouse of a computer.
 
 We are using four pre-trained models from the Intel Pre-trained Models Zoo:
