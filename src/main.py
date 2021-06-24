@@ -130,7 +130,6 @@ def infer_on_stream(args):
             headpose_angles = headpose_estimation.predict(frame, face, face_cords, args.display)
             gaze_vector = gaze_estimation.predict(frame, left_eye, right_eye, headpose_angles, eyes_center, args.display)
             mouse_controller.move(gaze_vector[0], gaze_vector[1])
-            fps.update()
         except Exception as e:
             print(str(e) + " for frame " + str(frame_count))
             continue
