@@ -69,8 +69,8 @@ pip3 install -r requirements.txt
     |--input_feeder.py
     |--main.py
     |--mouse_controller.py
-    |--README.md
-    |--requirements.txt
+|--README.md
+|--requirements.txt
 ```
 
 
