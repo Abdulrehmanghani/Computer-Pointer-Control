@@ -1,8 +1,7 @@
 # Computer Pointer Controller
 
-In this project, we will use several deep learning models from the OpenVINO model zoo to control the mouse pointer of a computer by using eye gaze. You will be using the Gaze Estimation model to estimate the gaze of the user's eyes and change the mouse pointer position accordingly.
+In this project, you will use several deep learning models from the OpenVINO model zoo to control the mouse pointer of a computer by using eye gaze. You will be using the Gaze Estimation model to estimate the gaze of the user's eyes and change the mouse pointer position accordingly.</br>
 Firstly, we will detect the face from the input video by using a face detection model. This detected face then passes it to two models for eyes detection and second for head pose estimation. At the end head pose angle and detected eyes image of left and right eye pass to the gaze estimation model to get the gaze vector. This gaze vector is used to control the mouse of a computer.
-
 
 We are using four pre-trained models from the Intel Pre-trained Models Zoo:
 * [Face Detection](https://docs.openvinotoolkit.org/latest/omz_models_intel_face_detection_adas_binary_0001_description_face_detection_adas_binary_0001.html)
@@ -29,27 +28,27 @@ source /opt/intel/openvino/bin/setupvars.sh
 
 You have to run the above command every time you open an new terminal window or activate a conda env.
 
-To download the models run the following commands after you have created a folder with name `model`.
+To download the models run the following commands after you have created a folder with name `model`.</br>
 **Face Detection Model**
 ```bash
-$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name face-detection-0200 --output_dir Computer-Pointer-Control/models
+python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name face-detection-0200 --output_dir Computer-Pointer-Control/models
 ```
 **Facial Landmarks Detection**
 ```bash
-$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name landmarks-regression-retail-0009 --output_dir Computer-Pointer-Control/models
+python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name landmarks-regression-retail-0009 --output_dir Computer-Pointer-Control/models
 ```
 **Head Pose Estimation**
 ```bash
-$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name head-pose-estimation-adas-0001 --output_dir Computer-Pointer-Control/models
+python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name head-pose-estimation-adas-0001 --output_dir Computer-Pointer-Control/models
 ```
 **Gaze Estimation Model**
 ```bash
-$ python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name gaze-estimation-adas-0002 --output_dir Computer-Pointer-Control/models
+python3 /opt/intel/openvino_2021.3.394/deployment_tools/tools/model_downloader/downloader.py --name gaze-estimation-adas-0002 --output_dir Computer-Pointer-Control/models
 ```
 
 Install the requirements:
 ```bash
-$ pip3 install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 **Project structure**
@@ -70,15 +69,17 @@ $ pip3 install -r requirements.txt
     |--input_feeder.py
     |--main.py
     |--mouse_controller.py
-    |--README.md
-    |--requirements.txt
+|--README.md
+|--requirements.txt
 ```
 
 
 ## Demo
 Step 1:  Go back to the project directory src folder
  
-        `cd src/` 
+ ```
+cd Computer-Pointer-Control/src/
+```
 Step 2: Run below commands to execute the project
  * Run on CPU
  ```
