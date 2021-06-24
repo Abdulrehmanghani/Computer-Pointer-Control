@@ -117,6 +117,11 @@ def infer_on_stream(args):
             break
         key_pressed = cv2.waitKey(60)
         frame_count += 1
+        if args.display:
+            cv2.imshow('Orignal video', cv2.resize(frame,(600,400)))
+            cv2.moveWindow('Orignal video',  100,60)
+            if key_pressed == 27:
+                exit()
         try:
             # Run inference on the models     
             face, face_cords = face_detection.predict(frame, args.display)
@@ -129,13 +134,17 @@ def infer_on_stream(args):
             left_eye, right_eye, eyes_center = landmark_detection.predict(frame, face, face_cords, args.display)
             headpose_angles = headpose_estimation.predict(frame, face, face_cords, args.display)
             gaze_vector = gaze_estimation.predict(frame, left_eye, right_eye, headpose_angles, eyes_center, args.display)
-            mouse_controller.move(gaze_vector[0], gaze_vector[1])
+            if args.display:
+                cv2.imshow('Computer pointer control', cv2.resize(frame,(600,400)))
+                cv2.moveWindow('Computer pointer control',  750,60)
+                if key_pressed == 27:
+                    exit()
+           # mouse_controller.move(gaze_vector[0], gaze_vector[1])
         except Exception as e:
             print(str(e) + " for frame " + str(frame_count))
             continue
         # Display the resulting frame
-        if args.display:
-            cv2.imshow('Visualization', cv2.resize(frame,(600,400)))
+        
      
     end_inf = time.time() - start_inf
     log_object.error("Total loading time: {}\nTotal inference time: {}\nFPS: {}".format(end_load, end_inf,frame_count/end_inf))
@@ -149,6 +158,7 @@ def main():
     Load the network and parse the output.
     :return: None
     """
+    time.sleep(7)
     # Grab command line args
     args = build_argparser().parse_args()
 

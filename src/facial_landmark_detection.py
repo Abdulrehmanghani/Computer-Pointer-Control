@@ -99,8 +99,8 @@ class FacialLandMark:
         xmax_r = face_cords[0] + x_r + 30
         ymax_r = face_cords[1] + y_r + 30
         if disp:
-            cv2.rectangle(image, (xmin_l, ymin_l), (xmax_l, ymax_l), (255,0,0), 2)        
-            cv2.rectangle(image, (xmin_r, ymin_r), (xmax_r, ymax_r), (255,0,0), 2)
+            cv2.rectangle(image, (xmin_l, ymin_l), (xmax_l, ymax_l), (255,0,0),thickness = 3)        
+            cv2.rectangle(image, (xmin_r, ymin_r), (xmax_r, ymax_r), (255,0,0),thickness = 3)
         left_eye_center =[face_cords[0] + x_l, face_cords[1] + y_l]
         right_eye_center = [face_cords[0] + x_r , face_cords[1] + y_r]      
         eyes_center = [left_eye_center, right_eye_center ]

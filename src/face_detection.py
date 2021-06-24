@@ -90,6 +90,6 @@ class FaceDetection:
                 face = image[y1:y2, x1:x2]
                 cords.append((x1,y1,x2,y2))
                 if disp:
-                    cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0), 3)
+                    cv2.rectangle(image, (x1-20, y1), (x2+20, y2), (255, 0, 0),thickness = 5)
                 cords = np.asarray(cords[0], dtype=np.int32)
         return cords ,face
