@@ -6,8 +6,9 @@ import os
 import numpy as np
 import cv2
 from openvino.inference_engine import IENetwork, IECore
+from model import Model
 
-class GazeEstimation:
+class GazeEstimation(Model):
     '''
     Class for the Face Detection Model.
     '''
@@ -15,33 +16,13 @@ class GazeEstimation:
         '''
         TODO: Use this to set your instance variables.
         '''
-        self.model_bin = model_name+'.bin'
-        self.model_xml = model_name+'.xml'
-        self.device = device
-        self.threshold = threshold
-        self.infer_network = IECore()
-        try:
-            self.model = IENetwork(model= self.model_xml, weights= self.model_bin)
-        except Exception as e:
-            raise ValueError("Could not Initialise the network. Have you enterred the correct model path?")
-       
+        super(). __init__( model_name, device='CPU', threshold = 0.6, extensions=None)
+
         self.input_name=[i for i in self.model.inputs.keys()]
         self.input_shape=self.model.inputs[self.input_name[1]].shape
         self.output_name=[o for o in self.model.outputs.keys()]   
-        #self.input_name= next(iter(self.model.inputs))
-        # self.input_shape=self.model.inputs[self.input_name].shape
-        
-        # self.output_name=next(iter(self.model.outputs))
-        # self.output_shape=self.model.outputs[self.output_name].shape
 
-    def load_model(self):
-        '''
-        TODO: You will need to complete this method.
-        This method is for loading the model to the device specified by the user.
-        If your model requires any Plugins, this is where you can load them.
-        '''
-        self.net = self.infer_network.load_network( self.model, self.device, num_requests=0)
-
+  
     def predict(self, image, left_eye_image, right_eye_image, head_pose_angles, eyes_center, disp):
         '''
         TODO: You will need to complete this method.
@@ -63,13 +44,6 @@ class GazeEstimation:
         
         return gaze_vector
 
-    def check_model(self):
-        supported_layers = self.infer_network.query_network(network=self.net, device_name="CPU")
-        unsupported_layers = [layer for layer in self.net.layers.keys() if layer not in supported_layers]
-        if len(unsupported_layers) > 0:
-            print("Check extention of these unsupported layers =>" + str(unsupported_layers))
-            exit(1)
-        print("All layers are supported")
 
     def preprocess_input(self, image):
         '''

@@ -75,7 +75,7 @@ def infer_on_stream(args):
     :param args: Command line arguments parsed by `build_argparser()`
     :return: None
     """
-    
+    log.basicConfig(format='%(asctime)s - %(message)s', level=log.INFO)
     # Initialise the classes
     try:
         face_detection = FaceDetection(args.fd_model, args.device)
@@ -88,7 +88,6 @@ def infer_on_stream(args):
 
     
     mouse_controller = MouseController('medium', 'fast')
-    log_object = log.getLogger()
 
     start_load = time.time()
     
@@ -97,7 +96,7 @@ def infer_on_stream(args):
     landmark_detection.load_model()
     headpose_estimation.load_model()
     gaze_estimation.load_model()
-    log_object.error("Models loaded: time: {:.3f} ms".format((time.time() - start_load) * 1000))
+    log.debug("Models loaded: time: {:.3f} ms".format((time.time() - start_load) * 1000))
     end_load = time.time() -  start_load 
     
     # Handle the input stream
@@ -117,17 +116,11 @@ def infer_on_stream(args):
             break
         key_pressed = cv2.waitKey(60)
         frame_count += 1
-        if args.display:
-            cv2.imshow('Orignal video', cv2.resize(frame,(600,400)))
-            cv2.moveWindow('Orignal video',  100,60)
-            if key_pressed == 27:
-                exit()
         try:
             # Run inference on the models     
             face, face_cords = face_detection.predict(frame, args.display)
             ## If no face detected move back to the top of the loop
             if len(face_cords) == 0:
-                log_object.error("No face found")
                 continue
             if key_pressed == 27:
                 break
@@ -137,28 +130,31 @@ def infer_on_stream(args):
             if args.display:
                 cv2.imshow('Computer pointer control', cv2.resize(frame,(600,400)))
                 cv2.moveWindow('Computer pointer control',  750,60)
-                if key_pressed == 27:
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    log.info("User stops the program")
                     exit()
            # mouse_controller.move(gaze_vector[0], gaze_vector[1])
         except Exception as e:
-            print(str(e) + " for frame " + str(frame_count))
+            log.warning(str(e) + " for frame " + str(frame_count))
             continue
         # Display the resulting frame
         
      
     end_inf = time.time() - start_inf
-    log_object.error("Total loading time: {}\nTotal inference time: {}\nFPS: {}".format(end_load, end_inf,frame_count/end_inf))
+    log.info("\notal loading time: {}\nTotal inference time: {}\nFPS: {}".format(end_load, end_inf,frame_count/end_inf))
+    
     # Release the capture
     feed.close()
     # Destroy any OpenCV windows
     cv2.destroyAllWindows
- 
+    log.debug("The program debug successfully")
+
 def main():
     """
     Load the network and parse the output.
     :return: None
     """
-    time.sleep(7)
+    #time.sleep(7)
     # Grab command line args
     args = build_argparser().parse_args()
 
