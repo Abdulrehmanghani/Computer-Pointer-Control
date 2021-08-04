@@ -17,7 +17,7 @@ class FaceDetection(Model):
         '''
         TODO: Use this to set your instance variables.
         ''' 
-        super(). __init__( model_name, device='CPU', threshold = 0.6, extensions=None)
+        super(). __init__( model_name, device, threshold = 0.6, extensions=None)
 
 
     def predict(self, image,disp):
