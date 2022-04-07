@@ -14,7 +14,7 @@ We are using four pre-trained models from the Intel Pre-trained Models Zoo:
 ## Project Set Up and Installation
 Make sure you have the OpenVINO toolkit installed on your system. This project is based on [Intel OpenVINO 2021.3.394](https://docs.openvinotoolkit.org/latest/index.html) toolkit, so if you don't have it, make sure to install it first before continue with the next steps. Read the dependencies listed on the openVINO website to install it.
 
-By using Conda with python==3.5:
+By using Conda with python==3.6:
 
 ```bash
 conda install openvino-ie4py-ubuntu18 -c intel
